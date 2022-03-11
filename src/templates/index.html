@@ -7,15 +7,15 @@
   <div class="text-center">
     <img src="https://logowik.com/content/uploads/images/159_coffee.jpg" class="imf-fluid img-responsive" style="height:200px">
   </div>
-    <form>
+    <form method="post">
+      {% csrf_token %}
   <div class="mb-3">
     <label for="exampleInputEmail1" class="form-label">Enter name</label>
-    <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
-    <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
+    <input type="name" name="name" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
   </div>
   <div class="mb-3">
     <label for="exampleInputPassword1" class="form-label">Enter Amount</label>
-    <input type="password" class="form-control" id="exampleInputPassword1">
+    <input name="amount" type="number" class="form-control" id="exampleInputPassword1">
   </div>
 
   <button type="submit" class="btn btn-success btn-block">Submit</button>
@@ -23,5 +23,51 @@
 
 
 </div>
+
+{% if payment %}
+<div class="text-center mx-auto">
+
+<button id="rzp-button1" >Pay</button>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+var options = {
+    "key": "rzp_test_ZY4ulZfKRFRCrI", // Enter the Key ID generated from the Dashboard
+    "amount": "{{payment.amount}}", // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+    "currency": "INR",
+    "name": "Coffee Corp",
+    "description": "Test Transaction",
+    "image": "https://example.com/your_logo",
+    "order_id": "{{payment.id}}", //This is a sample Order ID. Pass the `id` obtained in the response of Step 2
+    "callback_url": "/success",
+    "prefill": {
+        "name": "Gaurav Kumar",
+        "email": "gaurav.kumar@example.com",
+        "contact": "9999999999"
+    },
+    "notes": {
+        "address": "Razorpay Corporate Office"
+    },
+    "theme": {
+        "color": "#3399cc"
+    }
+};
+var rzp1 = new Razorpay(options);
+rzp1.on('payment.failed', function (response){
+        alert(response.error.code);
+        alert(response.error.description);
+        alert(response.error.source);
+        alert(response.error.step);
+        alert(response.error.reason);
+        alert(response.error.metadata.order_id);
+        alert(response.error.metadata.payment_id);
+});
+document.getElementById('rzp-button1').onclick = function(e){
+    rzp1.open();
+    e.preventDefault();
+}
+</script>
+
+{% endif %}
+  </div>
 
 {% endblock %}
